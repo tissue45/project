@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>찜 목록 테스트</title>
+    <style>
+        .wishlist-container { margin-top: 20px; }
+        .heart { font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h2>상품 목록</h2>
+    <div class="product" data-id="1" data-name="상품 A">
+        <span>상품 A</span>
+        <span class="heart" onclick="toggleWishlist(1, '상품 A')">🤍</span>
+    </div>
+    
+    <div class="product" data-id="2" data-name="상품 B">
+        <span>상품 B</span>
+        <span class="heart" onclick="toggleWishlist(2, '상품 B')">🤍</span>
+    </div>
+
+    <h2>찜 목록</h2>
+    <ul id="wishlist"></ul>
+
+    <script>
+        function getWishlist() {
+            return JSON.parse(localStorage.getItem("wishlist")) || [];
+        }
+
+        function saveWishlist(wishlist) {
+            localStorage.setItem("wishlist", JSON.stringify(wishlist));
+            renderWishlist();
+            updateHearts();
+        }
+
+        function toggleWishlist(id, name) {
+            let wishlist = getWishlist();
+            const index = wishlist.findIndex(item => item.id === id);
+
+            if (index === -1) {
+                wishlist.push({ id, name });
+            } else {
+                wishlist.splice(index, 1);
+            }
+
+            saveWishlist(wishlist);
+        }
+
+        function renderWishlist() {
+            let wishlist = getWishlist();
+            const wishlistElement = document.getElementById("wishlist");
+            wishlistElement.innerHTML = wishlist.map(item => 
+                `<li>${item.name}</li>`
+            ).join("");
+        }
+
+        function updateHearts() {
+            let wishlist = getWishlist();
+            document.querySelectorAll(".product").forEach(product => {
+                const id = parseInt(product.dataset.id);
+                const heart = product.querySelector(".heart");
+
+                if (wishlist.some(item => item.id === id)) {
+                    heart.textContent = "❤️";  // 빨간 하트
+                } else {
+                    heart.textContent = "🤍";  // 회색 하트
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderWishlist();
+            updateHearts();
+        });
+    </script>
+
+</body>
+</html>
